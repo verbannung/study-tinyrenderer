@@ -1,1 +1,8 @@
 framebuffer.tga
+cmake-build-debug
+.omo
+.idea
+.codegraph
+.cache
+build
+.vscode

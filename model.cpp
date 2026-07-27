@@ -59,7 +59,7 @@ int Model::nfaces() const { return facet_vrt.size()/3; }
 vec4 Model::vert(const int i) const {
     return verts[i];
 }
-
+// iface 第几个面（三角形)  nthvert 第几个顶点（三角形的三个顶点）
 vec4 Model::vert(const int iface, const int nthvert) const {
     return verts[facet_vrt[iface*3+nthvert]];
 }
