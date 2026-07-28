@@ -8,6 +8,8 @@ endif()
 project(tinyrenderer LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+# set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(iwyu "Run include-what-you-use")
 if(iwyu)
@@ -26,6 +28,16 @@ set(SOURCES main.cpp our_gl.cpp model.cpp tgaimage.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${OpenMP_CXX_FOUND}>:OpenMP::OpenMP_CXX>)
 
-add_executable(print print.cpp model.cpp tgaimage.cpp)
+add_executable(print study/print.cpp model.cpp tgaimage.cpp)
+target_include_directories(print PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_executable(rasterize study/rasterize.cpp model.cpp tgaimage.cpp)
+target_include_directories(rasterize PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_executable(rasterize2 study/rasterize2.cpp model.cpp tgaimage.cpp)
+target_include_directories(rasterize2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_executable(cut study/cut.cpp  tgaimage.cpp)
+target_include_directories(cut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")

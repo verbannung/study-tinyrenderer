@@ -1,5 +1,6 @@
 #include <cmath>
 #include <complex>
+#include <iostream>
 #include <tuple>
 #include "geometry.h"
 #include "model.h"

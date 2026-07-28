@@ -1,9 +1,22 @@
 framebuffer.tga
-cmake-build-debug
-.omo
-.idea
-.codegraph
-.cache
-build
-.vscode
-**/DS_Store
+
+# CMake / build outputs
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+compile_commands.json
+cmake_install.cmake
+.cursor
+
+# IDE / editor files
+.idea/
+.vscode/
+.omo/
+.codegraph/
+.cache/
+
+# macOS
+.DS_Store
+**/.DS_Store
