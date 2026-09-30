@@ -34,7 +34,7 @@ I firmly believe that understanding this is essential for writing efficient appl
 The final code consists of about 500 lines.
 My students typically require 10 to 20 hours of programming to start producing such renderers.
 The input is a 3D model composed of a triangulated mesh and textures.
-The output is a rendereding.
+The output is a rendering.
 There is no graphical interface, the program simply generates an image.
 
 To minimize external dependencies, I provide my students with a single class for handling [TGA](http://en.wikipedia.org/wiki/Truevision_TGA) files —
