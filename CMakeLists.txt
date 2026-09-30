@@ -37,7 +37,7 @@ target_include_directories(rasterize PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(rasterize2 study/rasterize2.cpp model.cpp tgaimage.cpp)
 target_include_directories(rasterize2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(cut study/cut.cpp  tgaimage.cpp)
-target_include_directories(cut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+# add_executable(cut study/cut.cpp tgaimage.cpp)
+# target_include_directories(cut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")
