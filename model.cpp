@@ -2,6 +2,7 @@
 #include <sstream>
 #include "model.h"
 
+// 只解析课程所需的 v/vt/vn 与三角形 f v/vt/vn；加载器不会自动三角化多边形。
 Model::Model(const std::string filename) {
     std::ifstream in;
     in.open(filename, std::ifstream::in);
@@ -25,6 +26,7 @@ Model::Model(const std::string filename) {
             iss >> trash >> trash;
             vec2 uv;
             for (int i : {0,1}) iss >> uv[i];
+            // OBJ 的 V 轴与规范化后的 TGA 行方向相反，在加载时统一翻转一次。
             tex.push_back({uv.x, 1-uv.y});
         } else if (!line.compare(0, 2, "f ")) {
             int f,t,n, cnt = 0;
@@ -42,6 +44,7 @@ Model::Model(const std::string filename) {
         }
     }
     std::cerr << "# v# " << nverts() << " f# "  << nfaces() << std::endl;
+    // 例如 foo.obj 推导出 foo_diffuse.tga、foo_nm_tangent.tga 与 foo_spec.tga。
     auto load_texture = [&filename](const std::string suffix, TGAImage &img) {
         size_t dot = filename.find_last_of(".");
         if (dot==std::string::npos) return;
@@ -70,6 +73,7 @@ vec4 Model::normal(const int iface, const int nthvert) const {
 
 vec4 Model::normal(const vec2 &uv) const {
     TGAColor c = normalmap.get(uv[0]*normalmap.width(), uv[1]*normalmap.height());
+    // TGAColor 为 BGR(A)，故按 [2],[1],[0] 还原 RGB；再把 [0,255] 映射到 [-1,1]。
     return normalized(vec4{(double)c[2],(double)c[1],(double)c[0],0}*2./255. - vec4{1,1,1,0});
 }
 
@@ -79,4 +83,3 @@ vec2 Model::uv(const int iface, const int nthvert) const {
 
 const TGAImage& Model::diffuse()  const { return diffusemap;  }
 const TGAImage& Model::specular() const { return specularmap; }
-

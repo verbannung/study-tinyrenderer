@@ -2,6 +2,7 @@
 #include "tgaimage.h"
 #include <cmath>
 
+// 学习阶段 2：按 y 排序并扫描上下半三角形；它不同于主渲染器的包围盒重心算法。
 constexpr int width  = 125;
 constexpr int height = 125;
 
@@ -46,7 +47,7 @@ void triangle(int ax, int ay, int bx, int by, int cx, int cy, TGAImage &framebuf
     if (ay>by) { std::swap(ax, bx); std::swap(ay, by); }
     if (ay>cy) { std::swap(ax, cx); std::swap(ay, cy); }
     if (by>cy) { std::swap(bx, cx); std::swap(by, cy); }
-    // 离散的黎曼积分 
+    // 对每条水平扫描线插值左右边界，再填充两者之间的像素。
     int total_height = cy-ay;
 
     if (ay != by) { // if the bottom half is not degenerate

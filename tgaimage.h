@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 
+// TGA 文件头必须逐字节对应磁盘布局，禁止编译器插入对齐填充。
 #pragma pack(push,1)
 struct TGAHeader {
     std::uint8_t  idlength = 0;
@@ -21,6 +22,7 @@ struct TGAHeader {
 #pragma pack(pop)
 
 struct TGAColor {
+    // TGA 真彩色通道顺序是 BGR/BGRA，而不是通常表述的 RGB/RGBA。
     std::uint8_t bgra[4] = {0,0,0,0};
     std::uint8_t bytespp = 4;
     std::uint8_t& operator[](const int i) { return bgra[i]; }
@@ -28,6 +30,7 @@ struct TGAColor {
 };
 
 struct TGAImage {
+    // framebuffer 与纹理共用行优先字节数组；读入后统一为内存中的左上原点。
     enum Format { GRAYSCALE=1, RGB=3, RGBA=4 };
     TGAImage() = default;
     TGAImage(const int w, const int h, const int bpp, TGAColor c = {});
@@ -46,4 +49,3 @@ private:
     std::uint8_t bpp = 0;
     std::vector<std::uint8_t> data = {};
 };
-

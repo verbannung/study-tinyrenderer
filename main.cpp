@@ -16,7 +16,9 @@ struct PhongShader : IShader {
     }
 
     virtual vec4 vertex(const int face, const int vert) {
+        // 顶点阶段写入跨阶段 varying；三个返回值由 main 组装为一个 Triangle。
         varying_uv[vert]  = model.uv(face, vert);
+        // 法线是方向(w=0)，inverse-transpose 在存在非均匀缩放时仍可保持与切面垂直。
         varying_nrm[vert] = ModelView.invert_transpose() * model.normal(face, vert);
         vec4 gl_Position = ModelView * model.vert(face, vert);
         tri[vert] = gl_Position;
@@ -24,9 +26,11 @@ struct PhongShader : IShader {
     }
 
     virtual std::pair<bool,TGAColor> fragment(const vec3 bar) const {
+        // 由观察空间边与 UV 边求 tangent/bitangent；UV 退化会使 U 的求逆奇异。
         mat<2,4> E = { tri[1]-tri[0], tri[2]-tri[0] };
         mat<2,2> U = { varying_uv[1]-varying_uv[0], varying_uv[2]-varying_uv[0] };
         mat<2,4> T = U.invert() * E;
+        // 前三行组成达布标架（Darboux/TBN frame），D.transpose() 把切线空间法线变到观察空间。
         mat<4,4> D = {normalized(T[0]),  // tangent vector
                       normalized(T[1]),  // bitangent vector
                       normalized(varying_nrm[0]*bar[0] + varying_nrm[1]*bar[1] + varying_nrm[2]*bar[2]), // interpolated normal
@@ -63,6 +67,7 @@ int main(int argc, char** argv) {
     init_zbuffer(width, height);
     TGAImage framebuffer(width, height, TGAImage::RGB, {177, 195, 209, 255});
 
+    // 无窗口或 GPU API：所有 OBJ 顺序绘入同一 CPU framebuffer/zbuffer，最终只输出一帧 TGA。
     for (int m=1; m<argc; m++) {                    // iterate through all input objects
         Model model(argv[m]);                       // load the data
         PhongShader shader(light, model);
@@ -77,4 +82,3 @@ int main(int argc, char** argv) {
     framebuffer.write_tga_file("framebuffer.tga");
     return 0;
 }
-

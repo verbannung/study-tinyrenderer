@@ -5,7 +5,7 @@
 #include "geometry.h"
 #include "model.h"
 #include "tgaimage.h"
-// 参考https://haqr.eu/tinyrenderer/bresenham/ 
+// 学习阶段 1：像素、Bresenham 风格直线与简单正交投影；尚无填充、深度或着色器。
 constexpr int width  = 800;
 constexpr int height = 800;
 
@@ -14,7 +14,7 @@ constexpr TGAColor green   = {  0, 255,   0, 255};
 constexpr TGAColor red     = {  0,   0, 255, 255};
 constexpr TGAColor blue    = {255, 128,  64, 255};
 constexpr TGAColor yellow  = {  0, 200, 255, 255};
-//渲染线段，从最增速最慢的轴开始，这样避免过多的像素的断裂情况
+// 选择变化更快的坐标为主轴，每步只写一个像素，避免陡线断裂。
 void line(int ax, int ay, int bx, int by, TGAImage &framebuffer, TGAColor color) {
     bool steep = std::abs(ax-bx) < std::abs(ay-by);
     if (steep) { // if the line is steep, we transpose the image

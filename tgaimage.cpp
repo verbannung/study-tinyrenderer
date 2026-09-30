@@ -30,6 +30,7 @@ bool TGAImage::read_tga_file(const std::string filename) {
     }
     size_t nbytes = bpp*w*h;
     data = std::vector<std::uint8_t>(nbytes, 0);
+    // 类型 2/3 是未压缩真彩色/灰度；类型 10/11 进入逐包 RLE 解码路径。
     if (3==header.datatypecode || 2==header.datatypecode) {
         in.read(reinterpret_cast<char *>(data.data()), nbytes);
         if (!in.good()) {
@@ -45,6 +46,7 @@ bool TGAImage::read_tga_file(const std::string filename) {
         std::cerr << "unknown file format " << (int)header.datatypecode << "\n";
         return false;
     }
+    // 文件可声明不同原点；统一成左上原点，使后续采样无需关心源文件方向。
     if (!(header.imagedescriptor & 0x20))
         flip_vertically();
     if (header.imagedescriptor & 0x10)
@@ -54,6 +56,7 @@ bool TGAImage::read_tga_file(const std::string filename) {
 }
 
 bool TGAImage::load_rle_data(std::ifstream &in) {
+    // 包头 <128 表示随后是若干原始像素；>=128 表示把一个像素重复若干次。
     size_t pixelcount = w*h;
     size_t currentpixel = 0;
     size_t currentbyte  = 0;
@@ -120,6 +123,7 @@ bool TGAImage::write_tga_file(const std::string filename, const bool vflip, cons
     header.imagedescriptor = vflip ? 0x00 : 0x20; // top-left or bottom-left origin
     out.write(reinterpret_cast<const char *>(&header), sizeof(header));
     if (!out.good()) goto err;
+    // rle=false 原样写像素；默认路径由 unload_rle_data 选择 raw/run-length 包。
     if (!rle) {
         out.write(reinterpret_cast<const char *>(data.data()), w*h*bpp);
         if (!out.good()) goto err;
@@ -203,4 +207,3 @@ int TGAImage::width() const {
 int TGAImage::height() const {
     return h;
 }
-
