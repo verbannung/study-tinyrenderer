@@ -3,6 +3,8 @@
 #include <cassert>
 #include <iostream>
 
+// 本文件提供渲染器的最小线性代数层。矩阵按行存储，m[row][column] 访问元素；
+// 主渲染路径使用 mat * vec，即把向量当作列向量。vec * mat 则表示行向量乘矩阵。
 template<int n> struct vec {
     double data[n] = {0};
     double& operator[](const int i)       { assert(i>=0 && i<n); return data[i]; }
@@ -77,6 +79,7 @@ template<int n> double norm(const vec<n>& v) {
 }
 
 template<int n> vec<n> normalized(const vec<n>& v) {
+    // 调用者须保证 v 非零；本教学实现不额外处理除零或退化几何。
     return v / norm(v);
 }
 
@@ -87,6 +90,7 @@ inline vec3 cross(const vec3 &v1, const vec3 &v2) {
 template<int n> struct dt;
 
 template<int nrows,int ncols> struct mat {
+    // rows 的第一维是行、第二维是列，初始化列表也按行书写。
     vec<ncols> rows[nrows] = {{}};
 
           vec<ncols>& operator[] (const int idx)       { assert(idx>=0 && idx<nrows); return rows[idx]; }
@@ -97,6 +101,7 @@ template<int nrows,int ncols> struct mat {
     }
 
     double cofactor(const int row, const int col) const {
+        // 删除指定行列得到子式，再乘 (-1)^(row+col) 得到代数余子式。
         mat<nrows-1,ncols-1> submatrix;
         for (int i=nrows-1; i--; )
             for (int j=ncols-1;j--; submatrix[i][j]=rows[i+int(i>=row)][j+int(j>=col)]);
@@ -104,13 +109,16 @@ template<int nrows,int ncols> struct mat {
     }
 
     mat<nrows,ncols> invert_transpose() const {
-        mat<nrows,ncols> adjugate_transpose; // transpose to ease determinant computation, check the last line
+        // 余子式矩阵等于 inverse-transpose * determinant；分母按第一行展开即 determinant。
+        // 奇异矩阵会在此除以零，本项目不检测这种情况。
+        mat<nrows,ncols> adjugate_transpose;
         for (int i=nrows; i--; )
             for (int j=ncols; j--; adjugate_transpose[i][j]=cofactor(i,j));
         return adjugate_transpose/(adjugate_transpose[0]*rows[0]);
     }
 
     mat<nrows,ncols> invert() const {
+        // inverse = transpose(inverse-transpose)，即 adjugate / determinant。
         return invert_transpose().transpose();
     }
 
@@ -127,6 +135,7 @@ template<int nrows,int ncols> vec<ncols> operator*(const vec<nrows>& lhs, const 
 }
 
 template<int nrows,int ncols> vec<nrows> operator*(const mat<nrows,ncols>& lhs, const vec<ncols>& rhs) {
+    // 标准矩阵乘列向量：每个输出分量是对应矩阵行与输入向量的点积。
     vec<nrows> ret;
     for (int i=nrows; i--; ret[i]=lhs[i]*rhs);
     return ret;
@@ -184,4 +193,3 @@ template<> struct dt<1> {   // template specialization to stop the recursion
         return src[0][0];
     }
 };
-

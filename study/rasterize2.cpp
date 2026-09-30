@@ -2,6 +2,7 @@
 #include "tgaimage.h"
 #include <cmath>
 
+// 学习阶段 3：在二维包围盒内用有向面积判断覆盖；主渲染器进一步计算深度和 varying。
 constexpr int width  = 125;
 constexpr int height = 125;
 
@@ -36,7 +37,7 @@ void line(int ax, int ay, int bx, int by, TGAImage &framebuffer, TGAColor color)
         }
     }
 }
-// 向量叉积计算三角形面积 
+// 鞋带公式计算有向面积；符号编码顶点绕序。
 double signed_triangle_area(int ax,int ay,int bx,int by,int cx,int cy){
     return .5*((by-ay)*(bx+ax) + (cy-by)*(cx+bx) + (ay-cy)*(ax+cx));
 }

@@ -1,6 +1,8 @@
 #include "geometry.h"
 #include "tgaimage.h"
 
+// OBJ/纹理输入模块：保留 OBJ 中彼此独立的 v、vt、vn 索引流，并加载约定命名的三张纹理。
+// 一个面角点可分别引用不同的位置、UV 和法线，所以三类索引不能合并。
 class Model {
     std::vector<vec4> verts = {};    // array of vertices        ┐ generally speaking, these arrays
     std::vector<vec4> norms = {};    // array of normal vectors  │ do not have the same size
@@ -24,4 +26,3 @@ public:
     const TGAImage& specular() const;
 
 };
-
